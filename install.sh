@@ -30,7 +30,8 @@ pacstrap /mnt base
 genfstab -U /mnt >> /mnt/etc/fstab
 
 # write the second part to be executed inside the chroot
-cat <<EOF > /mnt/root/part2.sh
+cat <<EOF > /mnt/part2.sh
+#!/bin/bash
 ln -sf /usr/share/zoneinfo/Europe/Rome /etc/localtime
 hwclock --systohc
 echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
@@ -47,7 +48,9 @@ grub-mkconfig -o /boot/grub/grub.cfg
 exit # leave the chroot
 EOF
 
-arch-chroot /mnt /root/part2.sh
+arch-chroot /mnt /part2.sh
+
+rm /mnt/part2.sh
 
 umount -R /mnt
 
