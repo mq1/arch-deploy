@@ -8,6 +8,8 @@ ROOT_PARTITION="/dev/sda8"
 
 MY_HOSTNAME="mq-desktop"
 
+MY_PASSWORD="secret"
+
 timedatectl set-ntp true
 
 # format the partitions
@@ -41,7 +43,7 @@ echo "$MY_HOSTNAME" > /etc/hostname
 echo "127.0.0.1 localhost" >> /etc/hosts
 echo "::1 localhost" >> /etc/hosts
 echo "127.0.1.1 $MY_HOSTNAME.localdomain $MY_HOSTNAME" >> /etc/hosts
-passwd
+echo "root:$MY_PASSWORD" | chpasswd
 pacman -S --noconfirm grub efibootmgr intel-ucode
 grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=arch-grub
 grub-mkconfig -o /boot/grub/grub.cfg
