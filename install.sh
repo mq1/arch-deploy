@@ -95,6 +95,9 @@ useradd -m -s /usr/bin/zsh -G wheel $USER_NAME
 # set the user password
 echo "$USER_NAME:$USER_PASSWORD" | chpasswd
 
+# add the wheel group (without password) to the sudoers file
+echo "%wheel ALL=(ALL) NOPASSWD: ALL" | EDITOR='tee -a' visudo
+
 # install oh-my-zsh
 sudo -H -u $USER_NAME bash -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 
