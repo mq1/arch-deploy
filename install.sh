@@ -50,6 +50,8 @@ grub-mkconfig -o /boot/grub/grub.cfg
 exit # leave the chroot
 EOF
 
+chmod +x /mnt/part2.sh
+
 arch-chroot /mnt /part2.sh
 
 rm /mnt/part2.sh
