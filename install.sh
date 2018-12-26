@@ -120,7 +120,7 @@ git clone https://aur.archlinux.org/yay.git
 cd yay
 makepkg --noconfirm --syncdeps --install
 cd /
-rm -rf yay
+rm -rf /tmp/yay
 
 # enable some services
 systemctl enable gdm.service
