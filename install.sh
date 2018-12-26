@@ -12,7 +12,7 @@ MY_HOSTNAME="mq-desktop"
 ROOT_PASSWORD="secret"
 USER_NAME="manuel"
 USER_PASSWORD="secret"
-TO_INSTALL="sudo gnome-shell gdm networkmanager nautilus tilix gnome-control-center gnome-tweaks python-nautilus xdg-user-dirs-gtk openssh git zsh flatpak gnome-software noto-fonts noto-fonts-cjk noto-fonts-emoji mpv youtube-dl"
+TO_INSTALL="sudo gnome-shell gdm networkmanager nautilus tilix gnome-control-center gnome-tweaks python-nautilus xdg-user-dirs-gtk openssh git zsh flatpak gnome-software noto-fonts noto-fonts-cjk noto-fonts-emoji mpv youtube-dl ntfs-3g"
 
 # PRE-INSTALLATION
 # ================
@@ -98,12 +98,12 @@ echo "$USER_NAME:$USER_PASSWORD" | chpasswd
 # add the wheel group (without password) to the sudoers file
 echo "%wheel ALL=(ALL) NOPASSWD: ALL" | EDITOR='tee -a' visudo
 
-# install oh-my-zsh
-sudo -H -u $USER_NAME bash -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+# install oh-my-zsh without entering zsh
+su - $USER_NAME -c "cd ~ && \$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh | sed 's:env zsh -l::g' | sed 's:chsh -s .*$::g')"
 
-# source vte.sh in zshrc (for tilix)
+# source vte.sh in zshrc (for tilix) and add an update function
 cat <<EOSF >> /home/$USER_NAME/.zshrc
-if [ \$TILIX_ID ] || [ \$VTE_VERSION ]; then
+if [ \\$TILIX_ID ] || [ \\$VTE_VERSION ]; then
     source /etc/profile.d/vte.sh
 fi
 
@@ -115,7 +115,12 @@ EOSF
 
 # install https://github.com/Jguer/yay
 pacman -S --noconfirm --needed base-devel
-sudo -H -u $USER_NAME bash -c "git clone https://aur.archlinux.org/yay.git && cd yay && makepkg --noconfirm --syncdeps --install && cd .. && rm -rf yay"
+cd /tmp
+git clone https://aur.archlinux.org/yay.git
+cd yay
+makepkg --noconfirm --syncdeps --install
+cd /
+rm -rf yay
 
 # enable some services
 systemctl enable gdm.service
