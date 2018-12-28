@@ -99,7 +99,7 @@ echo "$USER_NAME:$USER_PASSWORD" | chpasswd
 echo "%wheel ALL=(ALL) NOPASSWD: ALL" | EDITOR='tee -a' visudo
 
 # install oh-my-zsh without entering zsh
-su - $USER_NAME -c "cd ~ && \$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh | sed 's:env zsh -l::g' | sed 's:chsh -s .*$::g')"
+su - $USER_NAME -c "cd ~ && sh -c \$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh | sed 's:env zsh -l::g' | sed 's:chsh -s .*$::g')"
 
 # source vte.sh in zshrc (for tilix) and add an update function
 cat <<EOSF >> /home/$USER_NAME/.zshrc
