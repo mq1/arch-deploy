@@ -53,7 +53,7 @@ cat <<EOF > /mnt/part2.sh
 # set the time zone
 ln -sf /usr/share/zoneinfo/Europe/Rome /etc/localtime
 
-# run hwclock(8) to generate /etc/adjtime
+# run hwclock to generate /etc/adjtime
 hwclock --systohc
 
 # uncomment $LANGUAGE.UTF-8 UTF-8 in /etc/locale.gen
