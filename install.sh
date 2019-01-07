@@ -7,12 +7,39 @@ EFI_PARTITION="/dev/sda5"
 BOOT_PARTITION="/dev/sda6"
 SWAP_PARTITION="/dev/sda7"
 ROOT_PARTITION="/dev/sda8"
+LOCALTIME="Europe/Rome"
 LANGUAGE="en_US"
 MY_HOSTNAME="mq-desktop"
 ROOT_PASSWORD="secret"
 USER_NAME="manuel"
-USER_PASSWORD="secret"
-TO_INSTALL="sudo gnome-shell gdm networkmanager nautilus tilix gnome-control-center gnome-tweaks python-nautilus xdg-user-dirs-gtk openssh git zsh flatpak gnome-software noto-fonts noto-fonts-cjk noto-fonts-emoji mpv youtube-dl ntfs-3g"
+USER_PASSWORD=$ROOT_PASSWORD
+
+TO_INSTALL="nvidia" # my desktop
+#TO_INSTALL="wpa_supplicant dialog" # my laptop
+
+TO_INSTALL_COMMON=" \
+sudo \
+gnome-shell \
+gdm \
+networkmanager \
+nautilus \
+tilix \
+gnome-control-center \
+gnome-tweaks \
+python-nautilus \
+xdg-user-dirs-gtk \
+openssh \
+git \
+zsh \
+flatpak \
+gnome-software \
+noto-fonts \
+noto-fonts-cjk \
+noto-fonts-emoji \
+mpv \
+youtube-dl \
+ntfs-3g \
+gvfs-mtp"
 
 # PRE-INSTALLATION
 # ================
@@ -51,7 +78,7 @@ cat <<EOF > /mnt/part2.sh
 #!/bin/bash
 
 # set the time zone
-ln -sf /usr/share/zoneinfo/Europe/Rome /etc/localtime
+ln -sf /usr/share/zoneinfo/$LOCALTIME /etc/localtime
 
 # run hwclock to generate /etc/adjtime
 hwclock --systohc
@@ -87,7 +114,7 @@ grub-mkconfig -o /boot/grub/grub.cfg
 # ========
 
 # install some packages
-pacman -S --noconfirm $TO_INSTALL
+pacman -S --noconfirm $TO_INSTALL_COMMON $TO_INSTALL
 
 # create the user
 useradd -m -s /usr/bin/zsh -G wheel $USER_NAME
@@ -103,7 +130,7 @@ su - $USER_NAME -c "cd ~ && sh -c \$(curl -fsSL https://raw.githubusercontent.co
 
 # source vte.sh in zshrc (for tilix) and add an update function
 cat <<EOSF >> /home/$USER_NAME/.zshrc
-if [ \\$TILIX_ID ] || [ \\$VTE_VERSION ]; then
+if [ \\\$TILIX_ID ] || [ \\\$VTE_VERSION ]; then
     source /etc/profile.d/vte.sh
 fi
 
@@ -115,12 +142,7 @@ EOSF
 
 # install https://github.com/Jguer/yay
 pacman -S --noconfirm --needed base-devel
-cd /tmp
-git clone https://aur.archlinux.org/yay.git
-cd yay
-makepkg --noconfirm --syncdeps --install
-cd /
-rm -rf /tmp/yay
+su - $USER_NAME -c "cd ~ && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si --noconfirm && cd .. && rm -rf yay"
 
 # enable some services
 systemctl enable gdm.service
