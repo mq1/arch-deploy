@@ -12,7 +12,7 @@ LANGUAGE="en_US"
 ROOT_PASSWORD="secret"
 USER_NAME="manuel"
 USER_PASSWORD=$ROOT_PASSWORD
-PRESET="desktop" # destop or laptop
+PRESET="desktop" # desktop or laptop
 
 TO_INSTALL_COMMON=" \
 sudo \
@@ -36,10 +36,11 @@ noto-fonts-cjk \
 noto-fonts-emoji \
 youtube-dl \
 ntfs-3g \
-gvfs-mtp"
+gvfs-mtp \
+libva-utils"
 
 case $PRESET in
-    desktop) { MY_HOSTNAME="mq-desktop"; TO_INSTALL="nvidia" };;
+    desktop) { MY_HOSTNAME="mq-desktop"; TO_INSTALL="nvidia vdpauinfo" };;
     laptop)  { MY_HOSTNAME="mq-laptop"; TO_INSTALL="wpa_supplicant dialog intel-media-driver" };;
     *)       { MY_HOSTNAME="mq-box" };;
 esac
