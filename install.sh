@@ -9,13 +9,10 @@ SWAP_PARTITION="/dev/sda7"
 ROOT_PARTITION="/dev/sda8"
 LOCALTIME="Europe/Rome"
 LANGUAGE="en_US"
-MY_HOSTNAME="mq-desktop"
 ROOT_PASSWORD="secret"
 USER_NAME="manuel"
 USER_PASSWORD=$ROOT_PASSWORD
-
-TO_INSTALL="nvidia" # my desktop
-#TO_INSTALL="wpa_supplicant dialog" # my laptop
+PRESET="desktop" # destop or laptop
 
 TO_INSTALL_COMMON=" \
 sudo \
@@ -23,6 +20,7 @@ gnome-shell \
 gdm \
 networkmanager \
 nautilus \
+file-roller \
 tilix \
 gnome-control-center \
 gnome-tweaks \
@@ -36,10 +34,15 @@ gnome-software \
 noto-fonts \
 noto-fonts-cjk \
 noto-fonts-emoji \
-mpv \
 youtube-dl \
 ntfs-3g \
 gvfs-mtp"
+
+case $PRESET in
+    desktop) { MY_HOSTNAME="mq-desktop"; TO_INSTALL="nvidia" };;
+    laptop)  { MY_HOSTNAME="mq-laptop"; TO_INSTALL="wpa_supplicant dialog intel-media-driver" };;
+    *)       { MY_HOSTNAME="mq-box" };;
+esac
 
 # PRE-INSTALLATION
 # ================
@@ -76,6 +79,8 @@ genfstab -U /mnt >> /mnt/etc/fstab
 # write the second part to be executed inside the chroot
 cat <<EOF > /mnt/part2.sh
 #!/bin/bash
+
+PRESET=$PRESET
 
 # set the time zone
 ln -sf /usr/share/zoneinfo/$LOCALTIME /etc/localtime
@@ -140,9 +145,54 @@ function up {
 }
 EOSF
 
-# install https://github.com/Jguer/yay
+# prepare for installing packages from AUR
 pacman -S --noconfirm --needed base-devel
-su - $USER_NAME -c "cd ~ && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si --noconfirm && cd .. && rm -rf yay"
+cd /home/$USER_NAME
+
+# install https://github.com/Jguer/yay
+git clone https://aur.archlinux.org/yay.git
+su - $USER_NAME -c "cd ~/yay && makepkg -si --noconfirm"
+rm -rf yay
+
+# install chromium-vaapi
+git clone https://aur.archlinux.org/chromium-vaapi-bin.git
+su - $USER_NAME -c "cd ~/chromium-vaapi-bin && makepkg -si --noconfirm"
+rm -rf chromium-vaapi-bin
+
+# enable hardware acceleration on chromium-vaapi
+cat <<EOSF > .config/chromium-flags.conf
+--enable-accelerated-video
+--enable-accelerated-mjpeg-decode
+--disable-gpu-driver-bug-workarounds
+--ignore-gpu-blacklist
+--enable-gpu-rasterization
+--enable-zero-copy
+--enable-native-gpu-memory-buffers
+EOSF
+
+chown $USER_NAME .config/chromium-flags.conf
+
+# add the correct vaapi driver
+case \$PRESET in
+    desktop) {
+        git clone https://aur.archlinux.org/libva-vdpau-driver-chromium.git
+        su - $USER_NAME -c "cd ~/libva-vdpau-driver-chromium && makepkg -si --noconfirm"
+        rm -rf libva-vdpau-driver-chromium
+        echo "LIBVA_DRIVER_NAME=vdpau" >> /etc/environment
+        echo "VDPAU_DRIVER=nvidia" >> /etc/environment
+    };;
+    laptop) {
+        echo "LIBVA_DRIVER_NAME=iHD" >> /etc/environment
+    };;
+esac
+
+# install some flatpak apps
+flatpak install -y \
+    org.gnome.eog \
+    org.gnome.gedit \
+    de.haeckerfelix.Fragments \
+    io.github.GnomeMpv \
+    com.discordapp.Discord
 
 # enable some services
 systemctl enable gdm.service
