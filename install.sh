@@ -158,6 +158,7 @@ rm -rf yay
 # install chromium-vaapi
 echo '[maximbaz]' >> /etc/pacman.conf
 echo 'Server = https://pkgbuild.com/~maximbaz/repo/' >> /etc/pacman.conf
+pacman -Sy --noconfirm chromium-vaapi
 
 # enable hardware acceleration on chromium-vaapi
 cat <<EOSF > .config/chromium-flags.conf
