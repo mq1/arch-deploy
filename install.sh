@@ -59,7 +59,7 @@ timedatectl set-ntp true
 # format the partitions
 mkfs.vfat $EFI_PARTITION
 mkfs.ext4 -F $BOOT_PARTITION
-mkfs.ext4 -F $ROOT_PARTITION
+mkfs.f2fs -f $ROOT_PARTITION
 mkswap -f $SWAP_PARTITION
 swapon $SWAP_PARTITION
 
@@ -73,8 +73,8 @@ mount $EFI_PARTITION /mnt/boot/efi
 # INSTALLATION
 # ============
 
-# install the base packages
-pacstrap /mnt base
+# install the base packages and f2fs-tools
+pacstrap /mnt base f2fs-tools
 
 # CONFIGURE THE SYSTEM
 # ====================
