@@ -12,6 +12,7 @@ LANGUAGE="en_US"
 ROOT_PASSWORD="secret"
 USER_NAME="manuel"
 USER_PASSWORD=$ROOT_PASSWORD
+USER_EMAIL="manuelquarneti@protonmail.com"
 PRESET="desktop" # desktop or laptop
 
 TO_INSTALL_COMMON=" \
@@ -37,11 +38,15 @@ noto-fonts-emoji \
 youtube-dl \
 ntfs-3g \
 gvfs-mtp \
-libva-utils"
+libva-utils \
+grub \
+efibootmgr \
+intel-ucode \
+os-prober"
 
 case $PRESET in
     desktop) { MY_HOSTNAME="mq-desktop"; TO_INSTALL="nvidia vdpauinfo" };;
-    laptop)  { MY_HOSTNAME="mq-laptop"; TO_INSTALL="wpa_supplicant dialog intel-media-driver" };;
+    laptop)  { MY_HOSTNAME="mq-laptop"; TO_INSTALL="wpa_supplicant dialog intel-media-driver networkmanager-openvpn" };;
     *)       { MY_HOSTNAME="mq-box" };;
 esac
 
@@ -111,11 +116,6 @@ EOSF
 # set the root password
 echo "root:$ROOT_PASSWORD" | chpasswd
 
-# install and configure grub
-pacman -S --noconfirm grub efibootmgr intel-ucode
-grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=arch-grub
-grub-mkconfig -o /boot/grub/grub.cfg
-
 # MY STUFF
 # ========
 
@@ -170,10 +170,14 @@ cat <<EOSF > .config/chromium-flags.conf
 --enable-zero-copy
 --enable-native-gpu-memory-buffers
 EOSF
-
 chown $USER_NAME .config/chromium-flags.conf
 
-# add the correct vaapi driver
+# install chromium-widevine (required for Netflix)
+git clone https://aur.archlinux.org/chromium-widevine.git
+su - $USER_NAME -c "cd ~/chromium-widevine && makepkg -si --noconfirm"
+rm -rf chromium-widevine
+
+# configure vaapi
 case \$PRESET in
     desktop) {
         git clone https://aur.archlinux.org/libva-vdpau-driver-chromium.git
@@ -187,6 +191,9 @@ case \$PRESET in
     };;
 esac
 
+# generate a ED25519 SSH key pair
+su - $USER_NAME -c 'ssh-keygen -t ed25519 -C "$USER_EMAIL"'
+
 # install some flatpak apps
 flatpak install -y \
     org.gnome.eog \
@@ -199,6 +206,10 @@ flatpak install -y \
 systemctl enable gdm.service
 systemctl enable NetworkManager.service
 systemctl enable bluetooth.service
+
+# write the grub configuration file
+grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=arch-grub
+grub-mkconfig -o /boot/grub/grub.cfg
 
 # leave the chroot
 exit
