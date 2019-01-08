@@ -45,9 +45,9 @@ intel-ucode \
 os-prober"
 
 case $PRESET in
-    desktop) { MY_HOSTNAME="mq-desktop"; TO_INSTALL="nvidia vdpauinfo" };;
-    laptop)  { MY_HOSTNAME="mq-laptop"; TO_INSTALL="wpa_supplicant dialog intel-media-driver networkmanager-openvpn" };;
-    *)       { MY_HOSTNAME="mq-box" };;
+    desktop) MY_HOSTNAME="mq-desktop"; TO_INSTALL="nvidia vdpauinfo";;
+    laptop)  MY_HOSTNAME="mq-laptop"; TO_INSTALL="wpa_supplicant dialog intel-media-driver networkmanager-openvpn";;
+    *)       MY_HOSTNAME="mq-box";;
 esac
 
 # PRE-INSTALLATION
@@ -156,9 +156,8 @@ su - $USER_NAME -c "cd ~/yay && makepkg -si --noconfirm"
 rm -rf yay
 
 # install chromium-vaapi
-git clone https://aur.archlinux.org/chromium-vaapi-bin.git
-su - $USER_NAME -c "cd ~/chromium-vaapi-bin && makepkg -si --noconfirm"
-rm -rf chromium-vaapi-bin
+echo '[maximbaz]' >> /etc/pacman.conf
+echo 'Server = https://pkgbuild.com/~maximbaz/repo/' >> /etc/pacman.conf
 
 # enable hardware acceleration on chromium-vaapi
 cat <<EOSF > .config/chromium-flags.conf
@@ -179,16 +178,16 @@ rm -rf chromium-widevine
 
 # configure vaapi
 case \$PRESET in
-    desktop) {
+    desktop)
         git clone https://aur.archlinux.org/libva-vdpau-driver-chromium.git
         su - $USER_NAME -c "cd ~/libva-vdpau-driver-chromium && makepkg -si --noconfirm"
         rm -rf libva-vdpau-driver-chromium
         echo "LIBVA_DRIVER_NAME=vdpau" >> /etc/environment
         echo "VDPAU_DRIVER=nvidia" >> /etc/environment
-    };;
-    laptop) {
+    ;;
+    laptop)
         echo "LIBVA_DRIVER_NAME=iHD" >> /etc/environment
-    };;
+    ;;
 esac
 
 # generate a ED25519 SSH key pair
@@ -200,7 +199,6 @@ flatpak install -y \
     org.gnome.gedit \
     de.haeckerfelix.Fragments \
     io.github.GnomeMpv \
-    com.discordapp.Discord
 
 # enable some services
 systemctl enable gdm.service
