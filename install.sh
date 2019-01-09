@@ -151,9 +151,13 @@ pacman -S --noconfirm --needed base-devel
 cd /home/$USER_NAME
 
 # install https://github.com/Jguer/yay
-git clone https://aur.archlinux.org/yay.git
-su - $USER_NAME -c "cd ~/yay && makepkg -si --noconfirm"
-rm -rf yay
+su - $USER_NAME -c " \
+    cd ~; \
+    git clone https://aur.archlinux.org/yay.git; \
+    cd yay; \
+    makepkg -si --noconfirm; \
+    cd ..; \
+    rm -rf yay"
 
 # install chromium-vaapi
 echo '[maximbaz]' >> /etc/pacman.conf
@@ -173,16 +177,24 @@ EOSF
 chown $USER_NAME .config/chromium-flags.conf
 
 # install chromium-widevine (required for Netflix)
-git clone https://aur.archlinux.org/chromium-widevine.git
-su - $USER_NAME -c "cd ~/chromium-widevine && makepkg -si --noconfirm"
-rm -rf chromium-widevine
+su - $USER_NAME -c " \
+    cd ~; \
+    git clone https://aur.archlinux.org/chromium-widevine.git; \
+    cd chromium-widevine; \
+    makepkg -si --noconfirm; \
+    cd ..; \
+    rm -rf chromium-widevine"
 
 # configure vaapi
 case \$PRESET in
     desktop)
-        git clone https://aur.archlinux.org/libva-vdpau-driver-chromium.git
-        su - $USER_NAME -c "cd ~/libva-vdpau-driver-chromium && makepkg -si --noconfirm"
-        rm -rf libva-vdpau-driver-chromium
+        su - $USER_NAME -c " \
+            cd ~; \
+            git clone https://aur.archlinux.org/libva-vdpau-driver-chromium.git; \
+            cd libva-vdpau-driver-chromium; \
+            makepkg -si --noconfirm; \
+            cd ..; \
+            rm -rf libva-vdpau-driver-chromium"
         echo "LIBVA_DRIVER_NAME=vdpau" >> /etc/environment
         echo "VDPAU_DRIVER=nvidia" >> /etc/environment
     ;;
