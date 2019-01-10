@@ -12,37 +12,26 @@ LANGUAGE="en_US"
 ROOT_PASSWORD="secret"
 USER_NAME="manuel"
 USER_PASSWORD=$ROOT_PASSWORD
-USER_EMAIL="manuelquarneti@protonmail.com"
 PRESET="desktop" # desktop or laptop
 
 TO_INSTALL_COMMON=" \
 sudo \
-gnome-shell \
-gdm \
-networkmanager \
-nautilus \
-file-roller \
+gnome \
 tilix \
-gnome-control-center \
 gnome-tweaks \
 python-nautilus \
-xdg-user-dirs-gtk \
-openssh \
 git \
 zsh \
 flatpak \
-gnome-software \
 noto-fonts \
 noto-fonts-cjk \
 noto-fonts-emoji \
 youtube-dl \
 ntfs-3g \
-gvfs-mtp \
 libva-utils \
 grub \
 efibootmgr \
-intel-ucode \
-os-prober"
+intel-ucode"
 
 case $PRESET in
     desktop) MY_HOSTNAME="mq-desktop"; TO_INSTALL="nvidia vdpauinfo";;
@@ -202,16 +191,6 @@ case \$PRESET in
         echo "LIBVA_DRIVER_NAME=iHD" >> /etc/environment
     ;;
 esac
-
-# generate a ED25519 SSH key pair
-su - $USER_NAME -c 'ssh-keygen -t ed25519 -C "$USER_EMAIL"'
-
-# install some flatpak apps
-flatpak install -y \
-    org.gnome.eog \
-    org.gnome.gedit \
-    de.haeckerfelix.Fragments \
-    io.github.GnomeMpv \
 
 # enable some services
 systemctl enable gdm.service
