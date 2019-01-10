@@ -154,7 +154,7 @@ echo 'Server = https://pkgbuild.com/~maximbaz/repo/' >> /etc/pacman.conf
 pacman -Sy --noconfirm chromium-vaapi
 
 # enable hardware acceleration on chromium-vaapi
-cat <<EOSF > .config/chromium-flags.conf
+cat <<EOSF > /home/$USER_NAME/.config/chromium-flags.conf
 --enable-accelerated-video
 --enable-accelerated-mjpeg-decode
 --disable-gpu-driver-bug-workarounds
@@ -163,7 +163,7 @@ cat <<EOSF > .config/chromium-flags.conf
 --enable-zero-copy
 --enable-native-gpu-memory-buffers
 EOSF
-chown $USER_NAME .config/chromium-flags.conf
+chown $USER_NAME /home/$USER_NAME/.config/chromium-flags.conf
 
 # install chromium-widevine (required for Netflix)
 su - $USER_NAME -c " \
