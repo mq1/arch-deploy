@@ -26,6 +26,7 @@ flatpak \
 noto-fonts \
 noto-fonts-cjk \
 noto-fonts-emoji \
+chromium \
 youtube-dl \
 ntfs-3g \
 libva-utils \
@@ -148,15 +149,8 @@ su - $USER_NAME -c " \
     cd ..; \
     rm -rf yay"
 
-# install chromium-vaapi
-echo '[maximbaz]' >> /etc/pacman.conf
-echo 'Server = https://pkgbuild.com/~maximbaz/repo/' >> /etc/pacman.conf
-pacman -Sy --noconfirm chromium-vaapi
-
-# enable hardware acceleration on chromium-vaapi
+# force hardware acceleration on chromium
 cat <<EOSF > /home/$USER_NAME/.config/chromium-flags.conf
---enable-accelerated-video
---enable-accelerated-mjpeg-decode
 --disable-gpu-driver-bug-workarounds
 --ignore-gpu-blacklist
 --enable-gpu-rasterization
