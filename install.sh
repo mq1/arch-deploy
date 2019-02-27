@@ -16,12 +16,34 @@ PRESET="desktop" # desktop or laptop
 
 TO_INSTALL_COMMON=" \
 sudo \
-gnome \
+gnome-shell \
+gdm \
+networkmanager \
+nautilus \
+file-roller \
+gnome-control-center \
+xdg-user-dirs-gtk \
+gnome-backgrounds \
+gnome-software \
+gnome-keyring \
+gnome-system-monitor \
+gnome-screenshot \
+gvfs-mtp \
+gvfs-nfs \
+gvfs-smb \
+mousetweaks \
 tilix \
 gnome-tweaks \
 python-nautilus \
+openssh \
 git \
 zsh \
+zsh-autosuggestions \
+zsh-completions \
+zsh-history-substring-search \
+zsh-syntax-highlighting \
+zsh-theme-powerlevel9k \
+bat \
 flatpak \
 noto-fonts \
 noto-fonts-cjk \
@@ -121,43 +143,18 @@ echo "$USER_NAME:$USER_PASSWORD" | chpasswd
 # add the wheel group (without password) to the sudoers file
 echo "%wheel ALL=(ALL) NOPASSWD: ALL" | EDITOR='tee -a' visudo
 
-# install oh-my-zsh without entering zsh
-su - $USER_NAME -c "cd ~ && sh -c \$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh | sed 's:env zsh -l::g' | sed 's:chsh -s .*$::g')"
-
-# source vte.sh in zshrc (for tilix) and add an update function
-cat <<EOSF >> /home/$USER_NAME/.zshrc
-if [ \\\$TILIX_ID ] || [ \\\$VTE_VERSION ]; then
-    source /etc/profile.d/vte.sh
-fi
-
-function up {
-    yay
-    flatpak update
-}
-EOSF
-
 # prepare for installing packages from AUR
 pacman -S --noconfirm --needed base-devel
 cd /home/$USER_NAME
 
-# install https://github.com/Jguer/yay
+# install https://xyne.archlinux.ca/projects/bauerbill
 su - $USER_NAME -c " \
     cd ~; \
-    git clone https://aur.archlinux.org/yay.git; \
-    cd yay; \
+    git clone https://aur.archlinux.org/bauerbill.git; \
+    cd bauerbill; \
     makepkg -si --noconfirm; \
     cd ..; \
-    rm -rf yay"
-
-# force hardware acceleration on chromium
-cat <<EOSF > /home/$USER_NAME/.config/chromium-flags.conf
---disable-gpu-driver-bug-workarounds
---ignore-gpu-blacklist
---enable-gpu-rasterization
---enable-zero-copy
---enable-native-gpu-memory-buffers
-EOSF
-chown $USER_NAME /home/$USER_NAME/.config/chromium-flags.conf
+    rm -rf bauerbill"
 
 # install chromium-widevine (required for Netflix)
 su - $USER_NAME -c " \
@@ -185,6 +182,13 @@ case \$PRESET in
         echo "LIBVA_DRIVER_NAME=iHD" >> /etc/environment
     ;;
 esac
+
+# add the user's dotfiles
+su - $USER_NAME -c " \
+	git clone https://github.com/mquarneti/dotfiles.git ~/.dotfiles && \
+	chmod +x ~/.dotfiles/install.sh && \
+	~/.dotfiles/install.sh
+"
 
 # enable some services
 systemctl enable gdm.service
