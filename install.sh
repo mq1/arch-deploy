@@ -44,6 +44,7 @@ zsh-history-substring-search \
 zsh-syntax-highlighting \
 zsh-theme-powerlevel9k \
 bat \
+neovim \
 flatpak \
 noto-fonts \
 noto-fonts-cjk \
@@ -149,31 +150,31 @@ cd /home/$USER_NAME
 
 # install https://xyne.archlinux.ca/projects/bauerbill
 su - $USER_NAME -c " \
-    cd ~; \
-    git clone https://aur.archlinux.org/bauerbill.git; \
-    cd bauerbill; \
-    makepkg -si --noconfirm; \
-    cd ..; \
+    cd ~ && \
+    git clone https://aur.archlinux.org/bauerbill.git && \
+    cd bauerbill && \
+    makepkg -si --noconfirm && \
+    cd .. && \
     rm -rf bauerbill"
 
 # install chromium-widevine (required for Netflix)
 su - $USER_NAME -c " \
-    cd ~; \
-    git clone https://aur.archlinux.org/chromium-widevine.git; \
-    cd chromium-widevine; \
-    makepkg -si --noconfirm; \
-    cd ..; \
+    cd ~ && \
+    git clone https://aur.archlinux.org/chromium-widevine.git && \
+    cd chromium-widevine && \
+    makepkg -si --noconfirm && \
+    cd .. && \
     rm -rf chromium-widevine"
 
 # configure vaapi
 case \$PRESET in
     desktop)
         su - $USER_NAME -c " \
-            cd ~; \
-            git clone https://aur.archlinux.org/libva-vdpau-driver-chromium.git; \
-            cd libva-vdpau-driver-chromium; \
-            makepkg -si --noconfirm; \
-            cd ..; \
+            cd ~ && \
+            git clone https://aur.archlinux.org/libva-vdpau-driver-chromium.git && \
+            cd libva-vdpau-driver-chromium && \
+            makepkg -si --noconfirm && \
+            cd .. && \
             rm -rf libva-vdpau-driver-chromium"
         echo "LIBVA_DRIVER_NAME=vdpau" >> /etc/environment
         echo "VDPAU_DRIVER=nvidia" >> /etc/environment
