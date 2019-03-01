@@ -51,6 +51,7 @@ noto-fonts \
 noto-fonts-cjk \
 noto-fonts-emoji \
 chromium \
+mpv \
 youtube-dl \
 ntfs-3g \
 libva-utils \
