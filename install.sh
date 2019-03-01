@@ -43,6 +43,7 @@ zsh-completions \
 zsh-history-substring-search \
 zsh-syntax-highlighting \
 zsh-theme-powerlevel9k \
+ttf-hack \
 bat \
 neovim \
 flatpak \
@@ -148,14 +149,14 @@ echo "%wheel ALL=(ALL) NOPASSWD: ALL" | EDITOR='tee -a' visudo
 pacman -S --noconfirm --needed base-devel
 cd /home/$USER_NAME
 
-# install https://xyne.archlinux.ca/projects/bauerbill
+# install https://github.com/Jguer/yay
 su - $USER_NAME -c " \
     cd ~ && \
-    git clone https://aur.archlinux.org/bauerbill.git && \
-    cd bauerbill && \
+    git clone https://aur.archlinux.org/yay.git && \
+    cd yay && \
     makepkg -si --noconfirm && \
     cd .. && \
-    rm -rf bauerbill"
+    rm -rf yay "
 
 # install chromium-widevine (required for Netflix)
 su - $USER_NAME -c " \
