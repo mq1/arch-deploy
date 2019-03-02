@@ -28,6 +28,7 @@ gnome-software \
 gnome-keyring \
 gnome-system-monitor \
 gnome-screenshot \
+gnome-menus \
 gvfs-mtp \
 gvfs-nfs \
 gvfs-smb \
