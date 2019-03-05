@@ -47,6 +47,7 @@ zsh-theme-powerlevel9k \
 ttf-hack \
 bat \
 neovim \
+xclip \
 flatpak \
 noto-fonts \
 noto-fonts-cjk \
