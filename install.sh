@@ -44,7 +44,6 @@ zsh-completions \
 zsh-history-substring-search \
 zsh-syntax-highlighting \
 zsh-theme-powerlevel9k \
-ttf-hack \
 bat \
 lsd \
 gvim \
