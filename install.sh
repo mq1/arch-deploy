@@ -46,6 +46,7 @@ zsh-syntax-highlighting \
 zsh-theme-powerlevel9k \
 ttf-hack \
 bat \
+lsd \
 gvim \
 flatpak \
 noto-fonts \
@@ -102,6 +103,16 @@ genfstab -U /mnt >> /mnt/etc/fstab
 cat <<EOF > /mnt/part2.sh
 #!/bin/bash
 
+aur-install() {
+	su - $USER_NAME -c " \
+		cd ~ && \
+		git clone https://aur.archlinux.org/$1.git && \
+		cd $1 && \
+		makepkg -sirc --noconfirm && \
+		cd .. && \
+		rm -rf $1 "
+}
+
 PRESET=$PRESET
 
 # set the time zone
@@ -152,33 +163,18 @@ pacman -S --noconfirm --needed base-devel
 cd /home/$USER_NAME
 
 # install https://github.com/Jguer/yay
-su - $USER_NAME -c " \
-    cd ~ && \
-    git clone https://aur.archlinux.org/yay.git && \
-    cd yay && \
-    makepkg -si --noconfirm && \
-    cd .. && \
-    rm -rf yay "
+aur-install yay
 
 # install chromium-widevine (required for Netflix)
-su - $USER_NAME -c " \
-    cd ~ && \
-    git clone https://aur.archlinux.org/chromium-widevine.git && \
-    cd chromium-widevine && \
-    makepkg -si --noconfirm && \
-    cd .. && \
-    rm -rf chromium-widevine"
+aur-install chromium-widevine
+
+# install nerd fonts
+aur-install nerd-fonts-complete
 
 # configure vaapi
 case \$PRESET in
     desktop)
-        su - $USER_NAME -c " \
-            cd ~ && \
-            git clone https://aur.archlinux.org/libva-vdpau-driver-chromium.git && \
-            cd libva-vdpau-driver-chromium && \
-            makepkg -si --noconfirm && \
-            cd .. && \
-            rm -rf libva-vdpau-driver-chromium"
+        aur-install libva-vdpau-driver-chromium
         echo "LIBVA_DRIVER_NAME=vdpau" >> /etc/environment
         echo "VDPAU_DRIVER=nvidia" >> /etc/environment
     ;;
