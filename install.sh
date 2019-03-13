@@ -46,7 +46,8 @@ zsh-syntax-highlighting \
 zsh-theme-powerlevel9k \
 bat \
 lsd \
-gvim \
+neovim \
+xclip \
 flatpak \
 noto-fonts \
 noto-fonts-cjk \
