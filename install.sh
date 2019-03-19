@@ -14,7 +14,9 @@ USER_NAME="manuel"
 USER_PASSWORD=$ROOT_PASSWORD
 PRESET="desktop" # desktop or laptop
 
-TO_INSTALL_COMMON=" \
+TO_INSTALL=" \
+base \
+f2fs-tools \
 sudo \
 gnome-shell \
 gdm \
@@ -59,11 +61,13 @@ ntfs-3g \
 libva-utils \
 grub \
 efibootmgr \
-intel-ucode"
+intel-ucode \
+base-devel \
+"
 
 case $PRESET in
-    desktop) MY_HOSTNAME="mq-desktop"; TO_INSTALL="nvidia vdpauinfo";;
-    laptop)  MY_HOSTNAME="mq-laptop"; TO_INSTALL="wpa_supplicant dialog intel-media-driver networkmanager-openvpn";;
+    desktop) MY_HOSTNAME="mq-desktop"; TO_INSTALL="$TO_INSTALL nvidia vdpauinfo";;
+    laptop)  MY_HOSTNAME="mq-laptop"; TO_INSTALL="$TO_INSTALL wpa_supplicant dialog intel-media-driver";;
     *)       MY_HOSTNAME="mq-box";;
 esac
 
@@ -90,8 +94,8 @@ mount $EFI_PARTITION /mnt/boot/efi
 # INSTALLATION
 # ============
 
-# install the base packages and f2fs-tools
-pacstrap /mnt base f2fs-tools
+# install the packages
+pacstrap /mnt $TO_INSTALL
 
 # CONFIGURE THE SYSTEM
 # ====================
@@ -146,9 +150,6 @@ echo "root:$ROOT_PASSWORD" | chpasswd
 # MY STUFF
 # ========
 
-# install some packages
-pacman -S --noconfirm $TO_INSTALL_COMMON $TO_INSTALL
-
 # create the user
 useradd -m -s /usr/bin/zsh -G wheel $USER_NAME
 
@@ -157,10 +158,6 @@ echo "$USER_NAME:$USER_PASSWORD" | chpasswd
 
 # add the wheel group (without password) to the sudoers file
 echo "%wheel ALL=(ALL) NOPASSWD: ALL" | EDITOR='tee -a' visudo
-
-# prepare for installing packages from AUR
-pacman -S --noconfirm --needed base-devel
-cd /home/$USER_NAME
 
 # install https://github.com/Jguer/yay
 aur-install yay
