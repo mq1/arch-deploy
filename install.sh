@@ -54,7 +54,6 @@ flatpak \
 noto-fonts \
 noto-fonts-cjk \
 noto-fonts-emoji \
-chromium \
 mpv \
 youtube-dl \
 ntfs-3g \
@@ -161,6 +160,9 @@ echo "%wheel ALL=(ALL) NOPASSWD: ALL" | EDITOR='tee -a' visudo
 
 # install https://github.com/Jguer/yay
 aur-install yay
+
+# install chromium-vaapi-bin
+aur-install chromium-vaapi-bin
 
 # install chromium-widevine (required for Netflix)
 aur-install chromium-widevine
