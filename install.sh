@@ -17,6 +17,7 @@ DESKTOP_ENVIRONMENT="gnome"
 
 TO_INSTALL=" \
 base \
+base-devel \
 f2fs-tools \
 sudo \
 networkmanager \
@@ -43,34 +44,6 @@ libva-utils \
 grub \
 efibootmgr \
 intel-ucode \
-base-devel \
-"
-
-TO_INSTALL_GNOME=" \
-gnome-shell \
-gdm \
-nautilus \
-file-roller \
-gnome-control-center \
-xdg-user-dirs-gtk \
-gnome-backgrounds \
-gnome-software \
-gnome-keyring \
-gnome-system-monitor \
-gnome-screenshot \
-gnome-menus \
-gvfs-mtp \
-gvfs-nfs \
-gvfs-smb \
-mousetweaks \
-tilix \
-gnome-tweaks \
-python-nautilus \
-"
-
-TO_INSTALL_KDE=" \
-plasma-meta \
-plasma-wayland-session \
 "
 
 case $PRESET in
@@ -80,8 +53,8 @@ case $PRESET in
 esac
 
 case $DESKTOP_ENVIRONMENT in
-    gnome) TO_INSTALL="$TO_INSTALL $TO_INSTALL_GNOME";;
-    kde) TO_INSTALL="$TO_INSTALL $TO_INSTALL_KDE";;
+    gnome) TO_INSTALL="$TO_INSTALL gnome gnome-tweaks tilix python-nautilus";;
+    kde) TO_INSTALL="$TO_INSTALL plasma plasma-wayland-session";;
 esac
 
 # PRE-INSTALLATION
