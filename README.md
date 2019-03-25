@@ -7,7 +7,7 @@ It is intended to work (sometimes) on my desktop and my laptop, feel free to loo
 From archiso:
 
 ```sh
-wget https://raw.githubusercontent.com/mquarneti/my-arch-quickinstall/master/install.sh
+wget https://raw.githubusercontent.com/mquarneti/arch-deploy/master/install.sh
 chmod +x install.sh
 ./install.sh
 ```

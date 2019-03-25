@@ -100,7 +100,8 @@ aur-install() {
 		cd \$1 && \
 		makepkg -sirc --noconfirm && \
 		cd .. && \
-		rm -rf \$1 "
+		rm -rf \$1 \
+    "
 }
 
 PRESET=$PRESET
@@ -173,6 +174,9 @@ su - $USER_NAME -c " \
 	chmod +x ~/.dotfiles/install.sh && \
 	~/.dotfiles/install.sh
 "
+
+# set gtk theme to Adwaita-dark
+su - $USER_NAME -c "gsettings set org.gnome.desktop.interface gtk-theme Adwaita-dark"
 
 # enable display manager service
 case $DESKTOP_ENVIRONMENT in
