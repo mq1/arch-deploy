@@ -53,7 +53,7 @@ case $PRESET in
 esac
 
 case $DESKTOP_ENVIRONMENT in
-    gnome) TO_INSTALL="$TO_INSTALL gnome gnome-tweaks tilix python-nautilus";;
+    gnome) TO_INSTALL="$TO_INSTALL gnome gnome-tweaks";;
     kde) TO_INSTALL="$TO_INSTALL plasma plasma-wayland-session";;
 esac
 
