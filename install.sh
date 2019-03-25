@@ -13,31 +13,13 @@ ROOT_PASSWORD="secret"
 USER_NAME="manuel"
 USER_PASSWORD=$ROOT_PASSWORD
 PRESET="desktop" # desktop or laptop
+DESKTOP_ENVIRONMENT="gnome"
 
 TO_INSTALL=" \
 base \
 f2fs-tools \
 sudo \
-gnome-shell \
-gdm \
 networkmanager \
-nautilus \
-file-roller \
-gnome-control-center \
-xdg-user-dirs-gtk \
-gnome-backgrounds \
-gnome-software \
-gnome-keyring \
-gnome-system-monitor \
-gnome-screenshot \
-gnome-menus \
-gvfs-mtp \
-gvfs-nfs \
-gvfs-smb \
-mousetweaks \
-tilix \
-gnome-tweaks \
-python-nautilus \
 openssh \
 git \
 zsh \
@@ -64,10 +46,42 @@ intel-ucode \
 base-devel \
 "
 
+TO_INSTALL_GNOME=" \
+gnome-shell \
+gdm \
+nautilus \
+file-roller \
+gnome-control-center \
+xdg-user-dirs-gtk \
+gnome-backgrounds \
+gnome-software \
+gnome-keyring \
+gnome-system-monitor \
+gnome-screenshot \
+gnome-menus \
+gvfs-mtp \
+gvfs-nfs \
+gvfs-smb \
+mousetweaks \
+tilix \
+gnome-tweaks \
+python-nautilus \
+"
+
+TO_INSTALL_KDE=" \
+plasma-meta \
+plasma-wayland-session \
+"
+
 case $PRESET in
     desktop) MY_HOSTNAME="mq-desktop"; TO_INSTALL="$TO_INSTALL nvidia vdpauinfo";;
     laptop)  MY_HOSTNAME="mq-laptop"; TO_INSTALL="$TO_INSTALL wpa_supplicant dialog intel-media-driver";;
     *)       MY_HOSTNAME="mq-box";;
+esac
+
+case $DESKTOP_ENVIRONMENT in
+    gnome) TO_INSTALL="$TO_INSTALL $TO_INSTALL_GNOME";;
+    kde) TO_INSTALL="$TO_INSTALL $TO_INSTALL_KDE";;
 esac
 
 # PRE-INSTALLATION
@@ -117,6 +131,7 @@ aur-install() {
 }
 
 PRESET=$PRESET
+DESKTOP_ENVIRONMENT=$DESKTOP_ENVIRONMENT
 
 # set the time zone
 ln -sf /usr/share/zoneinfo/$LOCALTIME /etc/localtime
@@ -189,8 +204,13 @@ su - $USER_NAME -c " \
 	~/.dotfiles/install.sh
 "
 
-# enable some services
-systemctl enable gdm.service
+# enable display manager service
+case $DESKTOP_ENVIRONMENT in
+    gnome) systemctl enable gdm.service;;
+    kde) systemctl enable sddm.service;;
+esac
+
+# enable networkmanager and bluetooth services
 systemctl enable NetworkManager.service
 systemctl enable bluetooth.service
 
