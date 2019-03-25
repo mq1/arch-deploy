@@ -13,7 +13,7 @@ ROOT_PASSWORD="secret"
 USER_NAME="manuel"
 USER_PASSWORD=$ROOT_PASSWORD
 PRESET="desktop" # desktop or laptop
-DESKTOP_ENVIRONMENT="gnome"
+DESKTOP_ENVIRONMENT="gnome" # gnome or kde
 
 TO_INSTALL=" \
 base \
@@ -47,14 +47,14 @@ intel-ucode \
 "
 
 case $PRESET in
-    desktop) MY_HOSTNAME="mq-desktop"; TO_INSTALL="$TO_INSTALL nvidia vdpauinfo";;
-    laptop)  MY_HOSTNAME="mq-laptop"; TO_INSTALL="$TO_INSTALL wpa_supplicant dialog intel-media-driver";;
-    *)       MY_HOSTNAME="mq-box";;
+	desktop) MY_HOSTNAME="mq-desktop"; TO_INSTALL="$TO_INSTALL nvidia vdpauinfo";;
+	laptop)  MY_HOSTNAME="mq-laptop"; TO_INSTALL="$TO_INSTALL wpa_supplicant dialog intel-media-driver";;
+	*)       MY_HOSTNAME="mq-box";;
 esac
 
 case $DESKTOP_ENVIRONMENT in
-    gnome) TO_INSTALL="$TO_INSTALL gnome gnome-tweaks";;
-    kde) TO_INSTALL="$TO_INSTALL plasma plasma-wayland-session";;
+	gnome) TO_INSTALL="$TO_INSTALL gnome gnome-tweaks";;
+	kde) TO_INSTALL="$TO_INSTALL plasma plasma-wayland-session";;
 esac
 
 # PRE-INSTALLATION
@@ -101,7 +101,7 @@ aur-install() {
 		makepkg -sirc --noconfirm && \
 		cd .. && \
 		rm -rf \$1 \
-    "
+	"
 }
 
 PRESET=$PRESET
@@ -148,7 +148,7 @@ echo "$USER_NAME:$USER_PASSWORD" | chpasswd
 echo "%wheel ALL=(ALL) NOPASSWD: ALL" | EDITOR='tee -a' visudo
 
 # install https://github.com/Jguer/yay
-aur-install yay
+aur-install yay-bin
 
 # install chromium-vaapi-bin
 aur-install chromium-vaapi-bin
@@ -158,14 +158,14 @@ aur-install chromium-widevine
 
 # configure vaapi
 case \$PRESET in
-    desktop)
-        aur-install libva-vdpau-driver-chromium
-        echo "LIBVA_DRIVER_NAME=vdpau" >> /etc/environment
-        echo "VDPAU_DRIVER=nvidia" >> /etc/environment
-    ;;
-    laptop)
-        echo "LIBVA_DRIVER_NAME=iHD" >> /etc/environment
-    ;;
+	desktop)
+		aur-install libva-vdpau-driver-chromium
+		echo "LIBVA_DRIVER_NAME=vdpau" >> /etc/environment
+		echo "VDPAU_DRIVER=nvidia" >> /etc/environment
+	;;
+	laptop)
+		echo "LIBVA_DRIVER_NAME=iHD" >> /etc/environment
+	;;
 esac
 
 # add the user's dotfiles
@@ -175,13 +175,10 @@ su - $USER_NAME -c " \
 	~/.dotfiles/install.sh
 "
 
-# set gtk theme to Adwaita-dark
-su - $USER_NAME -c "gsettings set org.gnome.desktop.interface gtk-theme Adwaita-dark"
-
 # enable display manager service
 case $DESKTOP_ENVIRONMENT in
-    gnome) systemctl enable gdm.service;;
-    kde) systemctl enable sddm.service;;
+	gnome) systemctl enable gdm.service;;
+	kde) systemctl enable sddm.service;;
 esac
 
 # enable networkmanager and bluetooth services
