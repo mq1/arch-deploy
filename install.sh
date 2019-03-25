@@ -96,11 +96,11 @@ cat <<EOF > /mnt/part2.sh
 aur-install() {
 	su - $USER_NAME -c " \
 		cd ~ && \
-		git clone https://aur.archlinux.org/$1.git && \
-		cd $1 && \
+		git clone https://aur.archlinux.org/\$1.git && \
+		cd \$1 && \
 		makepkg -sirc --noconfirm && \
 		cd .. && \
-		rm -rf $1 "
+		rm -rf \$1 "
 }
 
 PRESET=$PRESET
@@ -154,9 +154,6 @@ aur-install chromium-vaapi-bin
 
 # install chromium-widevine (required for Netflix)
 aur-install chromium-widevine
-
-# install nerd fonts
-aur-install nerd-fonts-complete
 
 # configure vaapi
 case \$PRESET in

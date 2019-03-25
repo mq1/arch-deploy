@@ -1,6 +1,6 @@
 # My script for installing arch
 
-It is intended to work (sometimes) for my devices, feel free to look around
+It is intended to work (sometimes) on my desktop and my laptop, feel free to look around
 
 ## Usage:
 
