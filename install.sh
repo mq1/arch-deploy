@@ -144,7 +144,7 @@ echo "%wheel ALL=(ALL) NOPASSWD: ALL" | EDITOR='tee -a' visudo
 aur-install yay-bin
 
 # install chromium-vaapi-bin
-gpg --recv-keys EB4F9E5A60D32232BB52150C12C87A28FEAC6B20
+su - $USER_NAME -c "gpg --recv-keys EB4F9E5A60D32232BB52150C12C87A28FEAC6B20"
 aur-install chromium-vaapi-bin
 
 # install chromium-widevine (required for Netflix)
