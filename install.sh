@@ -3,10 +3,9 @@
 # INSTALLATION PARAMETERS
 # =======================
 
-EFI_PARTITION="/dev/sda5"
-BOOT_PARTITION="/dev/sda6"
-SWAP_PARTITION="/dev/sda7"
-ROOT_PARTITION="/dev/sda8"
+ESP_PARTITION="/dev/sda2"
+SWAP_PARTITION="/dev/sda5"
+ROOT_PARTITION="/dev/sda6"
 LOCALTIME="Europe/Rome"
 LANGUAGE="en_US"
 ROOT_PASSWORD="secret"
@@ -41,20 +40,18 @@ mpv \
 youtube-dl \
 ntfs-3g \
 libva-utils \
-grub \
-efibootmgr \
 intel-ucode \
 "
 
 case $PRESET in
 	desktop) MY_HOSTNAME="mq-desktop"; TO_INSTALL="$TO_INSTALL nvidia vdpauinfo";;
-	laptop)  MY_HOSTNAME="mq-laptop"; TO_INSTALL="$TO_INSTALL wpa_supplicant dialog intel-media-driver";;
+	laptop)  MY_HOSTNAME="mq-laptop"; TO_INSTALL="$TO_INSTALL wpa_supplicant intel-media-driver";;
 	*)       MY_HOSTNAME="mq-box";;
 esac
 
 case $DESKTOP_ENVIRONMENT in
-	gnome) TO_INSTALL="$TO_INSTALL gnome gnome-tweaks";;
-	kde) TO_INSTALL="$TO_INSTALL plasma plasma-wayland-session";;
+	gnome) TO_INSTALL="$TO_INSTALL gnome gnome-tweaks fragments";;
+	kde) TO_INSTALL="$TO_INSTALL plasma plasma-wayland-session qbittorrent";;
 esac
 
 # PRE-INSTALLATION
@@ -64,8 +61,6 @@ esac
 timedatectl set-ntp true
 
 # format the partitions
-mkfs.vfat $EFI_PARTITION
-mkfs.ext4 -F $BOOT_PARTITION
 mkfs.f2fs -f $ROOT_PARTITION
 mkswap -f $SWAP_PARTITION
 swapon $SWAP_PARTITION
@@ -73,9 +68,7 @@ swapon $SWAP_PARTITION
 # mount the file systems
 mount $ROOT_PARTITION /mnt
 mkdir /mnt/boot
-mount $BOOT_PARTITION /mnt/boot
-mkdir /mnt/boot/efi
-mount $EFI_PARTITION /mnt/boot/efi
+mount $ESP_PARTITION /mnt/boot
 
 # INSTALLATION
 # ============
@@ -185,9 +178,40 @@ esac
 systemctl enable NetworkManager.service
 systemctl enable bluetooth.service
 
-# write the grub configuration file
-grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=arch-grub
-grub-mkconfig -o /boot/grub/grub.cfg
+# install systemd-boot
+bootctl --path=/boot install
+
+# automatic systemd-boot update with pacman hook
+mkdir -p /etc/pacman.d/hooks
+cat <<EOSF > /etc/pacman.d/hooks/100-systemd-boot.hook
+[Trigger]
+Type = Package
+Operation = Upgrade
+Target = systemd
+
+[Action]
+Description = Updating systemd-boot
+When = PostTransaction
+Exec = /usr/bin/bootctl update
+EOSF
+
+# configure systemd-boot
+mkdir -p /boot/loader
+cat <<EOSF > /boot/loader/loader.conf
+default arch
+timeout 5
+console-mode max
+EOSF
+
+# add an entry for Arch to systemd-boot
+mkdir -p /boot/loader/entries
+cat <<EOSF > /boot/loader/entries/arch.conf
+title   Arch Linux
+linux   /vmlinuz-linux
+initrd  /intel-ucode.img
+initrd  /initramfs-linux.img
+options root=$ROOT_PARTITION
+EOSF
 
 # leave the chroot
 exit
