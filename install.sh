@@ -51,7 +51,7 @@ esac
 
 case $DESKTOP_ENVIRONMENT in
 	gnome) TO_INSTALL="$TO_INSTALL gnome gnome-tweaks fragments";;
-	kde) TO_INSTALL="$TO_INSTALL plasma plasma-wayland-session qbittorrent";;
+	kde) TO_INSTALL="$TO_INSTALL plasma plasma-wayland-session kde-applications qbittorrent";;
 esac
 
 # PRE-INSTALLATION
