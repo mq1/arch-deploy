@@ -3,15 +3,32 @@
 # INSTALLATION PARAMETERS
 # =======================
 
-ESP_PARTITION="/dev/sda2"
-SWAP_PARTITION="/dev/sda5"
-ROOT_PARTITION="/dev/sda6"
+# SUGGESTED PARTITION SCHEME
+# ==========================
+# DEVICE       PARTITION                         SIZE
+# /dev/sda1    Windows Recovery Environment      500MiB
+# /dev/sda2    Windows ESP                       100MiB
+# /dev/sda3    Microsoft Reserved Partition      16MiB
+# /dev/sda4    Microsoft basic data partition    Arbitrary
+# /dev/sda5    Linux ESP                         512MiB
+# /dev/sda6    Linux Swap                        8GiB
+# /dev/sda7    Linux Root                        Remaining space
+
+# partitioning
+LINUX_ESP="/dev/sda5" # efi system partition
+SWAP_PARTITION="/dev/sda6"
+ROOT_PARTITION="/dev/sda7"
+WINDOWS_ESP="/dev/sda2"
+
+# system configuration
 LOCALTIME="Europe/Rome"
 LANGUAGE="en_US"
 ROOT_PASSWORD="secret"
 USER_NAME="manuel"
 USER_PASSWORD=$ROOT_PASSWORD
-PRESET="desktop" # desktop or laptop
+
+# packages to install
+PRESET="desktop"            # desktop or laptop
 DESKTOP_ENVIRONMENT="gnome" # gnome or kde
 
 TO_INSTALL=" \
@@ -61,6 +78,7 @@ esac
 timedatectl set-ntp true
 
 # format the partitions
+mkfs.vfat -F32 $LINUX_ESP
 mkfs.f2fs -f $ROOT_PARTITION
 mkswap -f $SWAP_PARTITION
 swapon $SWAP_PARTITION
@@ -68,7 +86,14 @@ swapon $SWAP_PARTITION
 # mount the file systems
 mount $ROOT_PARTITION /mnt
 mkdir /mnt/boot
-mount $ESP_PARTITION /mnt/boot
+mount $LINUX_ESP /mnt/boot
+
+# copy the windows boot loader from $WINDOWS_ESP to $LINUX_ESP
+mkdir /mnt/boot/windows
+mount $WINDOWS_ESP /mnt/boot/windows
+cp -r /mnt/boot/windows/* /mnt/boot
+umount $WINDOWS_ESP
+rmdir /mnt/boot/windows
 
 # INSTALLATION
 # ============
