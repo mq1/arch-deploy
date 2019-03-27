@@ -236,7 +236,7 @@ title   Arch Linux
 linux   /vmlinuz-linux
 initrd  /intel-ucode.img
 initrd  /initramfs-linux.img
-options root=$ROOT_PARTITION
+options root=$ROOT_PARTITION rw
 EOSF
 
 # leave the chroot
