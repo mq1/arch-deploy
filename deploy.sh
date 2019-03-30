@@ -30,6 +30,7 @@ USER_PASSWORD=$ROOT_PASSWORD
 # packages to install
 PRESET="desktop"            # desktop or laptop
 DESKTOP_ENVIRONMENT="gnome" # gnome or kde
+WEB_BROWSER="firefox"       # firefox, chrome or chromium
 
 TO_INSTALL=" \
 base \
@@ -124,6 +125,7 @@ aur-install() {
 
 PRESET=$PRESET
 DESKTOP_ENVIRONMENT=$DESKTOP_ENVIRONMENT
+WEB_BROWSER=$WEB_BROWSER
 
 # set the time zone
 ln -sf /usr/share/zoneinfo/$LOCALTIME /etc/localtime
@@ -168,19 +170,31 @@ echo "%wheel ALL=(ALL) NOPASSWD: ALL" | EDITOR='tee -a' visudo
 # install https://github.com/Jguer/yay
 aur-install yay-bin
 
-# install chromium-vaapi-bin
-su - $USER_NAME -c "gpg --recv-keys EB4F9E5A60D32232BB52150C12C87A28FEAC6B20"
-aur-install chromium-vaapi-bin
+# install the web browser
+case \$WEB_BROWSER in
+	firefox)
+		pacman -S --no-confirm firefox
+	;;
+	chrome)
+		aur-install google-chrome
+	;;
+	chromium)
+		# install chromium-vaapi-bin and widevine (required for DRM apps ex. Netflix)
+		su - $USER_NAME -c "gpg --recv-keys EB4F9E5A60D32232BB52150C12C87A28FEAC6B20" && \
+		aur-install chromium-vaapi-bin && \
+		aur-install chromium-widevine
+	;;
+esac
 
-# install chromium-widevine (required for Netflix)
-aur-install chromium-widevine
-
-# configure vaapi
+# configure vaapi and vdpau
 case \$PRESET in
 	desktop)
-		aur-install libva-vdpau-driver-chromium
-		echo "LIBVA_DRIVER_NAME=vdpau" >> /etc/environment
-		echo "VDPAU_DRIVER=nvidia" >> /etc/environment
+		if [ "\$WEB_BROWSER" = "chromium" ]; then
+			aur-install libva-vdpau-driver-chromium
+		else
+			pacman -S --no-confirm libva-vdpau-driver
+		fi
+		echo "LIBVA_DRIVER_NAME=vdpau\nVDPAU_DRIVER=nvidia" >> /etc/environment
 	;;
 	laptop)
 		echo "LIBVA_DRIVER_NAME=iHD" >> /etc/environment
@@ -191,13 +205,13 @@ esac
 su - $USER_NAME -c " \
 	git clone https://github.com/mquarneti/dotfiles.git ~/.dotfiles && \
 	chmod +x ~/.dotfiles/install.sh && \
-	~/.dotfiles/install.sh
+	PRESET=$PRESET WEB_BROWSER=$WEB_BROWSER ~/.dotfiles/install.sh \
 "
 
 # enable display manager service
 case $DESKTOP_ENVIRONMENT in
 	gnome) systemctl enable gdm.service;;
-	kde) systemctl enable sddm.service;;
+	kde)   systemctl enable sddm.service;;
 esac
 
 # enable networkmanager and bluetooth services
@@ -226,7 +240,6 @@ mkdir -p /boot/loader
 cat <<EOSF > /boot/loader/loader.conf
 default arch
 timeout 5
-console-mode max
 EOSF
 
 # add an entry for Arch to systemd-boot
