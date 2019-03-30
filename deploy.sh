@@ -30,7 +30,10 @@ USER_PASSWORD=$ROOT_PASSWORD
 # packages to install
 PRESET="desktop"            # desktop or laptop
 DESKTOP_ENVIRONMENT="gnome" # gnome or kde
-WEB_BROWSER="firefox"       # firefox, chrome or chromium
+INSTALL_FIREFOX=true        # installs firefox
+INSTALL_CHROME=true         # installs google-chrome (aur)
+INSTALL_CHROMIUM=false      # installs chromium-vaapi-bin (aur), chromium-widevine (aur) and libva-vdpau-driver-chromium (aur)
+INSTALL_CODE=true           # installs code (visual studio code OSS build) and ttf-fira-code
 
 TO_INSTALL=" \
 base \
@@ -66,6 +69,10 @@ case $PRESET in
 	laptop)  MY_HOSTNAME="mq-laptop"; TO_INSTALL="$TO_INSTALL wpa_supplicant intel-media-driver";;
 	*)       MY_HOSTNAME="mq-box";;
 esac
+
+if $INSTALL_CODE; then
+	TO_INSTALL="$TO_INSTALL code ttf-fira-code"
+fi
 
 case $DESKTOP_ENVIRONMENT in
 	gnome) TO_INSTALL="$TO_INSTALL gnome gnome-tweaks fragments";;
@@ -125,7 +132,9 @@ aur-install() {
 
 PRESET=$PRESET
 DESKTOP_ENVIRONMENT=$DESKTOP_ENVIRONMENT
-WEB_BROWSER=$WEB_BROWSER
+INSTALL_FIREFOX=$INSTALL_FIREFOX
+INSTALL_CHROME=$INSTALL_CHROME
+INSTALL_CHROMIUM=$INSTALL_CHROMIUM
 
 # set the time zone
 ln -sf /usr/share/zoneinfo/$LOCALTIME /etc/localtime
@@ -170,26 +179,27 @@ echo "%wheel ALL=(ALL) NOPASSWD: ALL" | EDITOR='tee -a' visudo
 # install https://github.com/Jguer/yay
 aur-install yay-bin
 
-# install the web browser
-case \$WEB_BROWSER in
-	firefox)
-		pacman -S --noconfirm firefox
-	;;
-	chrome)
-		aur-install google-chrome
-	;;
-	chromium)
-		# install chromium-vaapi-bin and widevine (required for DRM apps ex. Netflix)
-		su - $USER_NAME -c "gpg --recv-keys EB4F9E5A60D32232BB52150C12C87A28FEAC6B20" && \
-		aur-install chromium-vaapi-bin && \
-		aur-install chromium-widevine
-	;;
-esac
+# install the web browser(s)
+
+if \$INSTALL_FIREFOX; then
+	pacman -S --noconfirm firefox
+fi
+
+if \$INSTALL_CHROME; then
+	aur-install google-chrome
+fi
+
+if \$INSTALL_CHROMIUM; then
+	# install chromium-vaapi-bin and widevine (required for DRM apps ex. Netflix)
+	su - $USER_NAME -c "gpg --recv-keys EB4F9E5A60D32232BB52150C12C87A28FEAC6B20" && \
+	aur-install chromium-vaapi-bin && \
+	aur-install chromium-widevine
+fi
 
 # configure vaapi and vdpau
 case \$PRESET in
 	desktop)
-		if [ "\$WEB_BROWSER" = "chromium" ]; then
+		if \$INSTALL_CHROMIUM; then
 			aur-install libva-vdpau-driver-chromium
 		else
 			pacman -S --noconfirm libva-vdpau-driver
@@ -205,7 +215,7 @@ esac
 su - $USER_NAME -c " \
 	git clone https://github.com/mquarneti/dotfiles.git ~/.dotfiles && \
 	chmod +x ~/.dotfiles/install.sh && \
-	PRESET=$PRESET WEB_BROWSER=$WEB_BROWSER ~/.dotfiles/install.sh \
+	PRESET=$PRESET INSTALL_CHROMIUM=$INSTALL_CHROMIUM INSTALL_CODE=$INSTALL_CODE ~/.dotfiles/install.sh \
 "
 
 # enable display manager service
