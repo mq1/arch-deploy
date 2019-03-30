@@ -173,7 +173,7 @@ aur-install yay-bin
 # install the web browser
 case \$WEB_BROWSER in
 	firefox)
-		pacman -S --no-confirm firefox
+		pacman -S --noconfirm firefox
 	;;
 	chrome)
 		aur-install google-chrome
@@ -192,7 +192,7 @@ case \$PRESET in
 		if [ "\$WEB_BROWSER" = "chromium" ]; then
 			aur-install libva-vdpau-driver-chromium
 		else
-			pacman -S --no-confirm libva-vdpau-driver
+			pacman -S --noconfirm libva-vdpau-driver
 		fi
 		echo "LIBVA_DRIVER_NAME=vdpau\nVDPAU_DRIVER=nvidia" >> /etc/environment
 	;;
