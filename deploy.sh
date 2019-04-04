@@ -75,8 +75,8 @@ if $INSTALL_CODE; then
 fi
 
 case $DESKTOP_ENVIRONMENT in
-	gnome) TO_INSTALL="$TO_INSTALL gnome gnome-tweaks fragments";;
-	kde) TO_INSTALL="$TO_INSTALL plasma plasma-wayland-session kde-applications qbittorrent";;
+	gnome) TO_INSTALL="$TO_INSTALL gnome gnome-tweaks tilix --ignore gnome-terminal";;
+	kde) TO_INSTALL="$TO_INSTALL plasma plasma-wayland-session kde-applications";;
 esac
 
 # PRE-INSTALLATION
