@@ -10,15 +10,16 @@
 # /dev/sda2    Windows ESP                       100MiB
 # /dev/sda3    Microsoft Reserved Partition      16MiB
 # /dev/sda4    Microsoft basic data partition    Arbitrary
-# /dev/sda5    Linux ESP                         512MiB
+# /dev/sda5    Linux ESP                         50MiB
+# /dev/sda6    Linux Boot                        200MiB
 # /dev/sda6    Linux Swap                        8GiB
 # /dev/sda7    Linux Root                        Remaining space
 
 # partitioning
-LINUX_ESP="/dev/sda5" # efi system partition
-SWAP_PARTITION="/dev/sda6"
-ROOT_PARTITION="/dev/sda7"
-WINDOWS_ESP="/dev/sda2"
+EFI_PARTITION="/dev/sda5"
+BOOT_PARTITION="/dev/sda6"
+SWAP_PARTITION="/dev/sda7"
+ROOT_PARTITION="/dev/sda8"
 
 # system configuration
 LOCALTIME="Europe/Rome"
@@ -62,6 +63,8 @@ youtube-dl \
 ntfs-3g \
 libva-utils \
 intel-ucode \
+grub \
+efibootmgr \
 "
 
 case $PRESET in
@@ -86,7 +89,8 @@ esac
 timedatectl set-ntp true
 
 # format the partitions
-mkfs.vfat -F32 $LINUX_ESP
+mkfs.vfat -F 32 $EFI_PARTITION
+mkfs.ext4 -F $BOOT_PARTITION
 mkfs.f2fs -f $ROOT_PARTITION
 mkswap -f $SWAP_PARTITION
 swapon $SWAP_PARTITION
@@ -94,14 +98,9 @@ swapon $SWAP_PARTITION
 # mount the file systems
 mount $ROOT_PARTITION /mnt
 mkdir /mnt/boot
-mount $LINUX_ESP /mnt/boot
-
-# copy the windows boot loader from $WINDOWS_ESP to $LINUX_ESP
-mkdir /mnt/boot/windows
-mount $WINDOWS_ESP /mnt/boot/windows
-cp -r /mnt/boot/windows/* /mnt/boot
-umount $WINDOWS_ESP
-rmdir /mnt/boot/windows
+mount $BOOT_PARTITION /mnt/boot
+mkdir /mnt/efi
+mount $EFI_PARTITION /mnt/efi
 
 # INSTALLATION
 # ============
@@ -229,39 +228,9 @@ esac
 systemctl enable NetworkManager.service
 systemctl enable bluetooth.service
 
-# install systemd-boot
-bootctl --path=/boot install
-
-# automatic systemd-boot update with pacman hook
-mkdir -p /etc/pacman.d/hooks
-cat <<EOSF > /etc/pacman.d/hooks/100-systemd-boot.hook
-[Trigger]
-Type = Package
-Operation = Upgrade
-Target = systemd
-
-[Action]
-Description = Updating systemd-boot
-When = PostTransaction
-Exec = /usr/bin/bootctl update
-EOSF
-
-# configure systemd-boot
-mkdir -p /boot/loader
-cat <<EOSF > /boot/loader/loader.conf
-default arch
-timeout 5
-EOSF
-
-# add an entry for Arch to systemd-boot
-mkdir -p /boot/loader/entries
-cat <<EOSF > /boot/loader/entries/arch.conf
-title   Arch Linux
-linux   /vmlinuz-linux
-initrd  /intel-ucode.img
-initrd  /initramfs-linux.img
-options root=$ROOT_PARTITION rw
-EOSF
+# install grub
+grub-install --target=x86_64-efi --efi-directory=/efi --bootloader-id=GRUB
+grub-mkconfig -o /boot/grub/grub.cfg
 
 # leave the chroot
 exit
