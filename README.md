@@ -8,6 +8,7 @@ From archiso:
 
 ```sh
 wget https://raw.githubusercontent.com/mquarneti/arch-deploy/master/deploy.sh
+# or wget https://git.io/fjtwW
 chmod +x deploy.sh
 ./deploy.sh
 ```
