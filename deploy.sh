@@ -31,9 +31,10 @@ USER_PASSWORD=$ROOT_PASSWORD
 # packages to install
 PRESET="desktop"            # desktop or laptop
 DESKTOP_ENVIRONMENT="gnome" # gnome or kde
-INSTALL_FIREFOX=true        # installs firefox
-INSTALL_CHROME=true         # installs google-chrome (aur)
+INSTALL_FIREFOX=false       # installs firefox
+INSTALL_CHROME=false        # installs google-chrome (aur)
 INSTALL_CHROMIUM=false      # installs chromium-vaapi-bin (aur), chromium-widevine (aur) and libva-vdpau-driver-chromium (aur)
+INSTALL_BRAVE=true          # installs brave-bin (aur)
 INSTALL_CODE=true           # installs code (visual studio code OSS build) and ttf-fira-code
 
 TO_INSTALL=" \
@@ -134,6 +135,7 @@ DESKTOP_ENVIRONMENT=$DESKTOP_ENVIRONMENT
 INSTALL_FIREFOX=$INSTALL_FIREFOX
 INSTALL_CHROME=$INSTALL_CHROME
 INSTALL_CHROMIUM=$INSTALL_CHROMIUM
+INSTALL_BRAVE=$INSTALL_BRAVE
 INSTALL_CODE=$INSTALL_CODE
 
 # set the time zone
@@ -196,6 +198,10 @@ if \$INSTALL_CHROMIUM; then
 	aur-install chromium-widevine
 fi
 
+if \$INSTALL_BRAVE; then
+	aur-install brave-bin
+fi
+
 # configure vaapi and vdpau
 case \$PRESET in
 	desktop)
@@ -204,7 +210,8 @@ case \$PRESET in
 		else
 			pacman -S --noconfirm libva-vdpau-driver
 		fi
-		echo "LIBVA_DRIVER_NAME=vdpau\nVDPAU_DRIVER=nvidia" >> /etc/environment
+		echo "LIBVA_DRIVER_NAME=vdpau
+VDPAU_DRIVER=nvidia" >> /etc/environment
 	;;
 	laptop)
 		echo "LIBVA_DRIVER_NAME=iHD" >> /etc/environment
