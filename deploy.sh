@@ -200,6 +200,7 @@ fi
 
 if \$INSTALL_BRAVE; then
 	aur-install brave-bin
+	echo "kernel.unprivileged_userns_clone = 1" > /etc/sysctl.d/00-local-userns.conf
 fi
 
 # configure vaapi and vdpau
