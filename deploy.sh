@@ -210,8 +210,7 @@ case \$PRESET in
 		else
 			pacman -S --noconfirm libva-vdpau-driver
 		fi
-		echo "LIBVA_DRIVER_NAME=vdpau
-VDPAU_DRIVER=nvidia" >> /etc/environment
+		echo "LIBVA_DRIVER_NAME=vdpau\\\nVDPAU_DRIVER=nvidia" >> /etc/environment
 	;;
 	laptop)
 		echo "LIBVA_DRIVER_NAME=iHD" >> /etc/environment
