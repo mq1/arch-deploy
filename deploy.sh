@@ -35,7 +35,7 @@ if [ -z $INSTALL_FIREFOX ]; then INSTALL_FIREFOX=false; fi           # installs 
 if [ -z $INSTALL_CHROME ]; then INSTALL_CHROME=false; fi             # installs google-chrome (aur)
 if [ -z $INSTALL_CHROMIUM ]; then INSTALL_CHROMIUM=false; fi         # installs chromium-vaapi-bin (aur), chromium-widevine (aur) and libva-vdpau-driver-chromium (aur)
 if [ -z $INSTALL_BRAVE ]; then INSTALL_BRAVE=true; fi                # installs brave-bin (aur)
-if [ -z $INSTALL_CODE ]; then INSTALL_CODE=true; fi                  # installs code (visual studio code OSS build) and ttf-fira-code
+if [ -z $INSTALL_CODE ]; then INSTALL_CODE=true; fi                  # installs code (visual studio code OSS build) and trash-cli
 
 TO_INSTALL=" \
 base \
@@ -75,7 +75,7 @@ case $PRESET in
 esac
 
 if $INSTALL_CODE; then
-	TO_INSTALL="$TO_INSTALL code ttf-fira-code"
+	TO_INSTALL="$TO_INSTALL code trash-cli"
 fi
 
 case $DESKTOP_ENVIRONMENT in
@@ -222,7 +222,7 @@ esac
 su - $USER_NAME -c " \
 	git clone https://github.com/mquarneti/dotfiles.git ~/.dotfiles && \
 	chmod +x ~/.dotfiles/install.sh && \
-	PRESET=$PRESET INSTALL_CHROMIUM=$INSTALL_CHROMIUM INSTALL_CODE=$INSTALL_CODE ~/.dotfiles/install.sh \
+	PRESET=$PRESET INSTALL_CHROMIUM=$INSTALL_CHROMIUM ~/.dotfiles/install.sh \
 "
 
 # enable display manager service
