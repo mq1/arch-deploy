@@ -7,8 +7,5 @@ It is intended to work (sometimes) on my desktop and my laptop, feel free to loo
 From archiso:
 
 ```sh
-wget https://raw.githubusercontent.com/mquarneti/arch-deploy/master/deploy.sh
-# or wget -O deploy.sh https://git.io/fjtwW
-chmod +x deploy.sh
-./deploy.sh
+curl -sSL https://git.io/fjtwW | ROOT_PASSWORD=password bash
 ```

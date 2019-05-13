@@ -16,26 +16,26 @@
 # /dev/sda7    Linux Root                        Remaining space
 
 # partitioning
-EFI_PARTITION="/dev/sda5"
-BOOT_PARTITION="/dev/sda6"
-SWAP_PARTITION="/dev/sda7"
-ROOT_PARTITION="/dev/sda8"
+if [ -z $EFI_PARTITION ]; then EFI_PARTITION="/dev/sda5"; fi
+if [ -z $BOOT_PARTITION ]; then BOOT_PARTITION="/dev/sda6"; fi
+if [ -z $SWAP_PARTITION ]; then SWAP_PARTITION="/dev/sda7"; fi
+if [ -z $ROOT_PARTITION ]; then ROOT_PARTITION="/dev/sda8"; fi
 
 # system configuration
-LOCALTIME="Europe/Rome"
-LANGUAGE="en_US"
-ROOT_PASSWORD="secret"
-USER_NAME="manuel"
-USER_PASSWORD=$ROOT_PASSWORD
+if [ -z $LOCALTIME ]; then LOCALTIME="Europe/Rome"; fi
+if [ -z $LANGUAGE ]; then LANGUAGE="en_US"; fi
+if [ -z $ROOT_PASSWORD ]; then echo "Root password not set, exiting..."; exit(1); fi
+if [ -z $USER_NAME ]; then USER_NAME="manuel"; fi
+if [ -z $USER_PASSWORD ]; then USER_PASSWORD=$ROOT_PASSWORD; fi
 
 # packages to install
-PRESET="desktop"            # desktop or laptop
-DESKTOP_ENVIRONMENT="gnome" # gnome or kde
-INSTALL_FIREFOX=false       # installs firefox
-INSTALL_CHROME=false        # installs google-chrome (aur)
-INSTALL_CHROMIUM=false      # installs chromium-vaapi-bin (aur), chromium-widevine (aur) and libva-vdpau-driver-chromium (aur)
-INSTALL_BRAVE=true          # installs brave-bin (aur)
-INSTALL_CODE=true           # installs code (visual studio code OSS build) and ttf-fira-code
+if [ -z $PRESET ]; then PRESET="desktop"; fi                         # desktop or laptop
+if [ -z $DESKTOP_ENVIRONMENT ]; then DESKTOP_ENVIRONMENT="gnome"; fi # gnome or kde
+if [ -z $INSTALL_FIREFOX ]; then INSTALL_FIREFOX=false; fi           # installs firefox
+if [ -z $INSTALL_CHROME ]; then INSTALL_CHROME=false; fi             # installs google-chrome (aur)
+if [ -z $INSTALL_CHROMIUM ]; then INSTALL_CHROMIUM=false; fi         # installs chromium-vaapi-bin (aur), chromium-widevine (aur) and libva-vdpau-driver-chromium (aur)
+if [ -z $INSTALL_BRAVE ]; then INSTALL_BRAVE=true; fi                # installs brave-bin (aur)
+if [ -z $INSTALL_CODE ]; then INSTALL_CODE=true; fi                  # installs code (visual studio code OSS build) and ttf-fira-code
 
 TO_INSTALL=" \
 base \
