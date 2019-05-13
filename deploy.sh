@@ -24,7 +24,7 @@ if [ -z $ROOT_PARTITION ]; then ROOT_PARTITION="/dev/sda8"; fi
 # system configuration
 if [ -z $LOCALTIME ]; then LOCALTIME="Europe/Rome"; fi
 if [ -z $LANGUAGE ]; then LANGUAGE="en_US"; fi
-if [ -z $ROOT_PASSWORD ]; then echo "Root password not set, exiting..."; exit(1); fi
+if [ -z $ROOT_PASSWORD ]; then echo "Root password not set, exiting..."; exit 1; fi
 if [ -z $USER_NAME ]; then USER_NAME="manuel"; fi
 if [ -z $USER_PASSWORD ]; then USER_PASSWORD=$ROOT_PASSWORD; fi
 
