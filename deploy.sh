@@ -59,8 +59,6 @@ flatpak \
 noto-fonts \
 noto-fonts-cjk \
 noto-fonts-emoji \
-mpv \
-youtube-dl \
 ntfs-3g \
 libva-utils \
 intel-ucode \
@@ -79,7 +77,7 @@ if $INSTALL_CODE; then
 fi
 
 case $DESKTOP_ENVIRONMENT in
-	gnome) TO_INSTALL="$TO_INSTALL gnome gnome-tweaks tilix python-nautilus --ignore=gnome-terminal,totem";;
+	gnome) TO_INSTALL="$TO_INSTALL gnome gnome-tweaks";;
 	kde) TO_INSTALL="$TO_INSTALL plasma plasma-wayland-session kde-applications";;
 esac
 
