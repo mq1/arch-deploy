@@ -7,5 +7,5 @@ It is intended to work (sometimes) on my desktop and my laptop, feel free to loo
 From archiso:
 
 ```sh
-curl -sSL https://git.io/fjtwW | ROOT_PASSWORD=password bash
+curl -sSL https://git.io/fjtwW | bash - --root-password=password
 ```
