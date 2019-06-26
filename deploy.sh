@@ -217,7 +217,7 @@ esac
 su - $USER_NAME -c " \
 	git clone https://github.com/mquarneti/dotfiles.git ~/.dotfiles && \
 	chmod +x ~/.dotfiles/install.sh && \
-	PRESET=$PRESET INSTALL_CHROMIUM=$INSTALL_CHROMIUM ~/.dotfiles/install.sh \
+	~/.dotfiles/install.sh \
 "
 
 # enable display manager service
