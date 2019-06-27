@@ -163,8 +163,8 @@ Options:
 	--root-password <ROOT_PASSWORD>
 	--user-name <USER_NAME>
 	--user-password <USER_PASSWORD>
-	--preset <desktop|laptop>            Default laptop
-	--desktop-environment <gnome|kde>    Default gnome
+	--preset <desktop|laptop>            Default "desktop"
+	--desktop-environment <gnome|kde>    Default "gnome"
 	--install-firefox
 	--install-chrome
 	--install-chromium
