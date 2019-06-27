@@ -150,7 +150,27 @@ while true; do
 			break
 			;;
 		*)
-			echo "Usage: deploy.sh --root-password=password"
+			cat <<EOF
+Usage: deploy.sh [OPTIONS]
+
+Options:
+	--efi-partition <EFI_PARTITION>
+	--boot-partition <BOOT_PARTITION>
+	--swap-partition <SWAP_PARTITION>
+	--root-partition <ROOT_PARTITION>
+	--localtime <LOCALTIME>
+	--language <LANGUAGE>
+	--root-password <ROOT_PASSWORD>
+	--user-name <USER_NAME>
+	--user-password <USER_PASSWORD>
+	--preset <desktop|laptop>            Default laptop
+	--desktop-environment <gnome|kde>    Default gnome
+	--install-firefox
+	--install-chrome
+	--install-chromium
+	--install-brave
+	--install-code
+EOF
 			exit 1
 			;;
 	esac
