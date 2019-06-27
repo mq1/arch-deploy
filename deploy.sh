@@ -295,7 +295,7 @@ echo "LANG=$LANGUAGE.UTF-8" > /etc/locale.conf
 # create the hostname file
 echo "$MY_HOSTNAME" > /etc/hostname
 
-# add matching entries to hostslibva-vdpau-driver-chromium
+# add matching entries to /etc/hosts
 cat <<EOSF >> /etc/hosts
 127.0.0.1 localhost
 ::1 localhost

@@ -1,3 +1,7 @@
+## DEPRECATED
+
+I'm now working on [ali](https://github.com/mquarneti/ali) (Arch Linux Installer)
+
 # My script for installing arch
 
 It is intended to work (sometimes) on my desktop and my laptop, feel free to look around
