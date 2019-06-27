@@ -16,29 +16,6 @@
 # /dev/sda7    Linux Root                        Remaining space
 
 
-# DEFAULTS
-# ========
-
-# partitioning
-EFI_PARTITION="/dev/sda5"
-BOOT_PARTITION="/dev/sda6"
-SWAP_PARTITION="/dev/sda7"
-ROOT_PARTITION="/dev/sda8"
-
-# system configuration
-LOCALTIME="Europe/Rome"
-LANGUAGE="en_US"
-USER_NAME="manuel"
-
-# packages to install
-PRESET="desktop"            # desktop or laptop
-DESKTOP_ENVIRONMENT="gnome" # gnome or kde
-INSTALL_FIREFOX=false       # installs firefox
-INSTALL_CHROME=false        # installs google-chrome (aur)
-INSTALL_CHROMIUM=false      # installs chromium-vaapi-bin (aur), chromium-widevine (aur) and libva-vdpau-driver-chromium (aur)
-INSTALL_BRAVE=false         # installs brave-bin (aur)
-INSTALL_VSCODIUM=false      # installs code (visual studio code OSS build) and trash-cli
-
 TO_INSTALL=" \
 base \
 base-devel \
@@ -72,8 +49,9 @@ TO_INSTALL_AUR="yay-bin"
 # ================
 
 LONGOPTS="efi-partition:,boot-partition:,swap-partition:,root-partition:" # partitioning
-LONGOPTS="$LONGOPTS,localtime:,language:,root-password:,user-name:,user-password:" # system configuration
-LONGOPTS="$LONGOPTS,preset:,desktop-environment:,install-firefox,install-chrome,install-chromium,install-brave,install-code" # packages to install
+LONGOPTS="$LONGOPTS,hostname:,localtime:,language:,root-password:,user-name:,user-password:" # system configuration
+LONGOPTS="$LONGOPTS,nvidia,intel" # video driver
+LONGOPTS="$LONGOPTS,install-gnome:,install-kde:,install-firefox,install-chrome,install-chromium,install-brave,install-vscodium" # packages to install
 
 OPTS=$(getopt -o h --long $LONGOPTS,help --name "$0" -- "$@")
 if [ $? != 0 ] ; then echo "Failed to parse options, exiting..." >&2 ; exit 1 ; fi
@@ -97,6 +75,10 @@ while true; do
 			ROOT_PARTITION="$2"
 			shift 2
 			;;
+		--hostname)
+			MY_HOSTNAME="$2"
+			shift 2
+			;;
 		--localtime)
 			LOCALTIME="$2"
 			shift 2
@@ -117,13 +99,21 @@ while true; do
 			USER_PASSWORD="$2"
 			shift 2
 			;;
-		--preset)
-			PRESET="$2"
-			shift 2
+		--nvidia)
+			INSTALL_NVIDIA=true
+			shift
 			;;
-		--desktop-environment)
-			DESKTOP_ENVIRONMENT="$2"
-			shift 2
+		--intel)
+			INSTALL_INTEL=true
+			shift
+			;;
+		--install-gnome)
+			INSTALL_GNOME=true
+			shift
+			;;
+		--install-kde)
+			INSTALL_KDE=true
+			shift
 			;;
 		--install-firefox)
 			INSTALL_FIREFOX=true
@@ -141,8 +131,8 @@ while true; do
 			INSTALL_BRAVE=true
 			shift
 			;;
-		--install-code)
-			INSTALL_CODE=true
+		--install-vscodium)
+			INSTALL_VSCODIUM=true
 			shift
 			;;
 		--)
@@ -153,44 +143,65 @@ while true; do
 			cat <<EOF
 Usage: deploy.sh [OPTIONS]
 
+Example: deploy.sh --efi-partition=/dev/sda5 --boot-partition=/dev/sda6 --swap-partition=/dev/sda7 --root-partition=/dev/sda8 \
+                   --hostname=mq-desktop --localtime=Europe/Rome --language=en_US --root-password=password --user-name=manuel \
+				   --nvidia --install-gnome --install-brave --install-vscodium
+
 Options:
 	--efi-partition <EFI_PARTITION>
 	--boot-partition <BOOT_PARTITION>
 	--swap-partition <SWAP_PARTITION>
 	--root-partition <ROOT_PARTITION>
+	--hostname <HOSTNAME>
 	--localtime <LOCALTIME>
 	--language <LANGUAGE>
 	--root-password <ROOT_PASSWORD>
 	--user-name <USER_NAME>
 	--user-password <USER_PASSWORD>
-	--preset <desktop|laptop>            Default "desktop"
-	--desktop-environment <gnome|kde>    Default "gnome"
+	--nvidia
+	--intel
+	--install-gnome
+	--install-kde
 	--install-firefox
 	--install-chrome
 	--install-chromium
 	--install-brave
-	--install-code
+	--install-vscodium
 EOF
 			exit 1
 			;;
 	esac
 done
 
-if [ -z "$ROOT_PASSWORD" ]; then
-	echo "Root password not set (use deploy.sh -h for more info), exiting..."
+if [ -z "$EFI_PARTITION$BOOT_PARTITION$SWAP_PARTITION$ROOT_PARTITION$HOSTNAME$LOCALTIME$LANGUAGE$ROOT_PASSWORD$USER_NAME" ]; then
+	echo "Argument(s) missing (use deploy.sh -h for more info), exiting..."
 	exit 1
 fi
 
-case $PRESET in
-	desktop) MY_HOSTNAME="mq-desktop"; TO_INSTALL="$TO_INSTALL nvidia vdpauinfo";;
-	laptop)  MY_HOSTNAME="mq-laptop"; TO_INSTALL="$TO_INSTALL wpa_supplicant intel-media-driver";;
-	*)       MY_HOSTNAME="mq-box";;
-esac
+if [ -z "$USER_PASSWORD" ]; then
+	USER_PASSWORD="$ROOT_PASSWORD"
+fi
 
-case $DESKTOP_ENVIRONMENT in
-	gnome) TO_INSTALL="$TO_INSTALL gnome gnome-tweaks tilix python-nautilus";;
-	kde) TO_INSTALL="$TO_INSTALL plasma plasma-wayland-session kde-applications";;
-esac
+if $INSTALL_NVIDIA; then
+	TO_INSTALL="$TO_INSTALL nvidia vdpauinfo"
+	if $INSTALL_CHROMIUM; then
+		TO_INSTALL_AUR="$TO_INSTALL_AUR libva-vdpau-driver-chromium"
+	else
+		TO_INSTALL="$TO_INSTALL libva-vdpau-driver"
+	fi
+fi
+
+if $INSTALL_INTEL; then
+	TO_INSTALL="$TO_INSTALL intel-media-driver"
+fi
+
+if $INSTALL_GNOME; then
+	TO_INSTALL="$TO_INSTALL gnome gnome-tweaks tilix python-nautilus"
+fi
+
+if $INSTALL_KDE; then
+	TO_INSTALL="$TO_INSTALL plasma plasma-wayland-session kde-applications"
+fi
 
 if $INSTALL_FIREFOX; then
 	TO_INSTALL="$TO_INSTALL firefox"
@@ -202,14 +213,6 @@ fi
 
 if $INSTALL_CHROMIUM; then
 	TO_INSTALL_AUR="$TO_INSTALL_AUR chromium-vaapi-bin chromium-widevine"
-fi
-
-if [ $PRESET == "desktop" ]; then
-	if $INSTALL_CHROMIUM; then
-		TO_INSTALL_AUR="$TO_INSTALL_AUR libva-vdpau-driver-chromium"
-	else
-		TO_INSTALL="$TO_INSTALL libva-vdpau-driver"
-	fi
 fi
 
 if $INSTALL_BRAVE; then
