@@ -75,7 +75,7 @@ LONGOPTS="efi-partition:,boot-partition:,swap-partition:,root-partition:" # part
 LONGOPTS="$LONGOPTS,localtime:,language:,root-password:,user-name:,user-password:" # system configuration
 LONGOPTS="$LONGOPTS,preset:,desktop-environment:,install-firefox,install-chrome,install-chromium,install-brave,install-code" # packages to install
 
-OPTS=$(getopt -o "" --long $LONGOPTS --name "$0" -- "$@")
+OPTS=$(getopt -o h --long $LONGOPTS,help --name "$0" -- "$@")
 if [ $? != 0 ] ; then echo "Failed to parse options, exiting..." >&2 ; exit 1 ; fi
 eval set -- "$OPTS"
 
@@ -177,7 +177,7 @@ EOF
 done
 
 if [ -z "$ROOT_PASSWORD" ]; then
-	echo "Root password not set, exiting..."
+	echo "Root password not set (use deploy.sh -h for more info), exiting..."
 	exit 1
 fi
 
